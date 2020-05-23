@@ -3,9 +3,61 @@ sources:
     Linux:
       url: "http://download.qt.io/official_releases/qtcreator/4.12/4.12.1/installer_source/linux_gcc_64_rhel72/qtcreator.7z"
       sha256: "57219e48b0ec58b90dc2f72473471cb9b378b6537d48a3389bec9992e1d01ad5"
+      patterns:
+        - bin/qbs*
+        - bin/qt.conf
+        - lib/qtcreator/libqbs*
+        - lib/qtcreator/plugins/qbs/*
+        - lib/Qt/lib/libic*
+        - lib/Qt/lib/libQt5Core*
+        - lib/Qt/lib/libQt5DBus*
+        - lib/Qt/lib/libQt5Gui*
+        - lib/Qt/lib/libQt5Network*
+        - lib/Qt/lib/libQt5PrintSupport*
+        - lib/Qt/lib/libQt5Script*
+        - lib/Qt/lib/libQt5Widgets*
+        - lib/Qt/lib/libQt5Xml*
+        - lib/Qt/lib/libQt5XcbQpa*
+        - lib/Qt/plugins/platforms/libqxcb*
+        - lib/Qt/plugins/platformthemes/libqgtk3*
+        - libexec/qtcreator/qbs/*
+        - share/qtcreator/qbs/*
+      binpath: bin
     Macos:
       url: http://download.qt.io/official_releases/qtcreator/4.12/4.12.1/installer_source/mac_x64/qtcreator.7z
       sha256: 1fa7748abfd349da2d20cff2d8cf3da41aaf89e5bc7bfaa30bd06c447b77bd16
+      patterns:
+        - Qt Creator.app/Contents/MacOS/qbs*
+        - Qt Creator.app/Contents/MacOS/qbs/*
+        - Qt Creator.app/Contents/Frameworks/libqbs*
+        - Qt Creator.app/Contents/Frameworks/QtCore*
+        - Qt Creator.app/Contents/Frameworks/QtDBus*
+        - Qt Creator.app/Contents/Frameworks/QtGui*
+        - Qt Creator.app/Contents/Frameworks/QtNetwork*
+        - Qt Creator.app/Contents/Frameworks/QtPrintSupport*
+        - Qt Creator.app/Contents/Frameworks/QtScript*
+        - Qt Creator.app/Contents/Frameworks/QtWidgets*
+        - Qt Creator.app/Contents/Frameworks/QtXml*
+        - Qt Creator.app/Contents/PlugIns/qbs/*
+        - Qt Creator.app/Contents/PlugIns/platforms/*
+        - Qt Creator.app/Contents/PlugIns/styles/*
+        - Qt Creator.app/Contents/Resources/qbs/*
+      binpath: Qt Creator.app/Contents/MacOS
     Windows:
       url: http://download.qt.io/official_releases/qtcreator/4.12/4.12.1/installer_source/windows_msvc2017_x64/qtcreator.7z
       sha256: 50461e0bc44b0af6094f6a0e07e3f2a3db4de137f7f8d7b8ac1a915e14778310
+      patterns:
+        - bin/qbs*
+        - bin/Qt5Core*
+        - bin/Qt5DBus*
+        - bin/Qt5Gui*
+        - bin/Qt5Network*
+        - bin/Qt5PrintSupport*
+        - bin/Qt5Script*
+        - bin/Qt5Widgets*
+        - bin/Qt5Xml*
+        - bin/dw*
+        - lib/Qt/plugins/platforms/qwindows*
+        - lib/Qt/plugins/styles/qwindowsvistastyle*
+      binpath: bin
+
