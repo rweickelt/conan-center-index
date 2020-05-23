@@ -10,16 +10,10 @@ sources:
         - lib/qtcreator/plugins/qbs/*
         - lib/Qt/lib/libic*
         - lib/Qt/lib/libQt5Core*
-        - lib/Qt/lib/libQt5DBus*
         - lib/Qt/lib/libQt5Gui*
         - lib/Qt/lib/libQt5Network*
-        - lib/Qt/lib/libQt5PrintSupport*
         - lib/Qt/lib/libQt5Script*
-        - lib/Qt/lib/libQt5Widgets*
         - lib/Qt/lib/libQt5Xml*
-        - lib/Qt/lib/libQt5XcbQpa*
-        - lib/Qt/plugins/platforms/libqxcb*
-        - lib/Qt/plugins/platformthemes/libqgtk3*
         - libexec/qtcreator/qbs/*
         - share/qtcreator/qbs/*
       binpath: bin
@@ -28,19 +22,13 @@ sources:
       sha256: 1fa7748abfd349da2d20cff2d8cf3da41aaf89e5bc7bfaa30bd06c447b77bd16
       patterns:
         - Qt Creator.app/Contents/MacOS/qbs*
-        - Qt Creator.app/Contents/MacOS/qbs/*
         - Qt Creator.app/Contents/Frameworks/libqbs*
         - Qt Creator.app/Contents/Frameworks/QtCore*
-        - Qt Creator.app/Contents/Frameworks/QtDBus*
         - Qt Creator.app/Contents/Frameworks/QtGui*
         - Qt Creator.app/Contents/Frameworks/QtNetwork*
-        - Qt Creator.app/Contents/Frameworks/QtPrintSupport*
         - Qt Creator.app/Contents/Frameworks/QtScript*
-        - Qt Creator.app/Contents/Frameworks/QtWidgets*
         - Qt Creator.app/Contents/Frameworks/QtXml*
         - Qt Creator.app/Contents/PlugIns/qbs/*
-        - Qt Creator.app/Contents/PlugIns/platforms/*
-        - Qt Creator.app/Contents/PlugIns/styles/*
         - Qt Creator.app/Contents/Resources/qbs/*
       binpath: Qt Creator.app/Contents/MacOS
     Windows:
@@ -49,15 +37,10 @@ sources:
       patterns:
         - bin/qbs*
         - bin/Qt5Core*
-        - bin/Qt5DBus*
         - bin/Qt5Gui*
         - bin/Qt5Network*
-        - bin/Qt5PrintSupport*
         - bin/Qt5Script*
-        - bin/Qt5Widgets*
         - bin/Qt5Xml*
         - bin/dw*
-        - lib/Qt/plugins/platforms/qwindows*
-        - lib/Qt/plugins/styles/qwindowsvistastyle*
       binpath: bin
 
