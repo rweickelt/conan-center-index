@@ -2,10 +2,10 @@ sources:
   "1.16.0":
     Linux:
       url: "http://download.qt.io/official_releases/qtcreator/4.12/4.12.1/installer_source/linux_gcc_64_rhel72/qtcreator.7z"
-      md5: "ba6bfeb65c8b6a6713bfba098f7ec40c"
+      sha256: "57219e48b0ec58b90dc2f72473471cb9b378b6537d48a3389bec9992e1d01ad5"
     Macos:
       url: http://download.qt.io/official_releases/qtcreator/4.12/4.12.1/installer_source/mac_x64/qtcreator.7z
-      md5: 29610787ea9538ee589952db9e0d9523
+      sha256: 1fa7748abfd349da2d20cff2d8cf3da41aaf89e5bc7bfaa30bd06c447b77bd16
     Windows:
       url: http://download.qt.io/official_releases/qtcreator/4.12/4.12.1/installer_source/windows_msvc2017_x64/qtcreator.7z
-      md5: f092e538ede6d015d6f913b7c63d02cf
+      sha256: 50461e0bc44b0af6094f6a0e07e3f2a3db4de137f7f8d7b8ac1a915e14778310

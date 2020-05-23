@@ -7,11 +7,11 @@ class QbsConan(ConanFile):
     description = "The Qbs build system"
     topics = ("conan", "qbs", "build", "automation")
     url = "https://github.com/conan-io/conan-center-index"
-    homepage = "https://qbs.io"
+    homepage = "http://qbs.io"
     license = "LGPL-2.1-only", "LGPL-3.0-only", "Nokia-Qt-exception-1.1"
     settings = {
-        "arch_build": ["x86_64"],
-        "os_build": ["Linux", "Macos", "Windows"]
+        "arch": ["x86_64"],
+        "os": ["Linux", "Macos", "Windows"]
     }
 
     def source(self):
