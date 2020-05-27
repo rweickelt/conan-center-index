@@ -1,0 +1,38 @@
+language: cpp
+
+git:
+  submodules: false
+
+jobs:
+  include:
+    - dist: bionic
+      addons:
+        apt:
+          - python3-pip
+      before_install:
+        - pip3 install --user --upgrade pip setuptools
+        - pip3 install --user conan
+        - conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+        - conan config set hooks.conan-center
+      script:
+        - conan create recipes/qbs/all/ qbs/1.16.0@conan/stable
+
+    - os: osx
+      osx_image: xcode11.3
+      before_install:
+        - sudo pip3 install conan
+        - conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+        - conan config set hooks.conan-center
+      script:
+        - conan create recipes/qbs/all/ qbs/1.16.0@conan/stable
+
+    - os: windows
+      env:
+        - PATH="/c/Python38:/c/Python39:/c/Python38/Scripts:/c/Python39/Scripts:${PATH}"
+      before_install:
+        - choco install python
+        - pip3 install conan
+        - conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+        - conan config set hooks.conan-center
+      script:
+        - conan create recipes/qbs/all/ qbs/1.16.0@conan/stable
