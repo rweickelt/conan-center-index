@@ -1,13 +1,23 @@
-import os
 from six import StringIO
 from conans import ConanFile, tools
+from pathlib import Path
 
 
 class QbsTestConan(ConanFile):
-    settings = "arch_build", "os_build"
+    settings = {
+        "arch": ["x86_64"],
+        "os": ["Linux", "Macos", "Windows"]
+    }
+
+    def build(self):
+        args = ["--file %s" % self.source_folder]
+        self.run("qbs build %s" % " ".join(args), run_environment=True)
 
     def test(self):
         if not tools.cross_building(self.settings):
+            # Run the build result
+            self.run("qbs run -p test", run_environment=True)
+
             output = StringIO()
             self.run("qbs show-version")
             self.run("qbs show-version", output=output, run_environment=True)
