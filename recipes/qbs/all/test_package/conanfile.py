@@ -1,7 +1,5 @@
 from six import StringIO
 from conans import ConanFile, tools
-from pathlib import Path
-
 
 class QbsTestConan(ConanFile):
     settings = {

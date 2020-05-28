@@ -1,5 +1,6 @@
 from conans import ConanFile, tools
-from pathlib import Path
+from conans.errors import ConanInvalidConfiguration
+import os
 
 class QbsConan(ConanFile):
     name = "qbs"
@@ -8,15 +9,14 @@ class QbsConan(ConanFile):
     url = "https://github.com/conan-io/conan-center-index"
     homepage = "http://qbs.io"
     license = "LGPL-2.1-only", "LGPL-3.0-only", "Nokia-Qt-exception-1.1"
-    settings = {
-        "arch": ["x86_64"],
-        "os": [
-            "Linux",
-            "Macos",
-            "Windows"
-        ]
-    }
+    settings = "arch", "os"
     no_copy_source=True
+
+    def configure(self):
+        if self.settings.os not in ["Windows", "Linux", "Macos"]:
+            raise ConanInvalidConfiguration("The OS ({}) is not supported by {}.".format(self.settings.os, self.name))
+        if self.settings.arch not in ["x86_64"]:
+            raise ConanInvalidConfiguration("The arch ({}) is not supported by {}.".format(self.settings.arch, self.name))
 
     def source(self):
         tools.get(**self._data['sources'])
@@ -30,8 +30,8 @@ class QbsConan(ConanFile):
             self.copy(**p, symlinks=True)
 
     def package_info(self):
-        binpath = Path(self.package_folder, self._data['bin_folder'])
-        self.env_info.PATH.append(str(binpath))
+        binpath = os.path.join(self.package_folder, self._data['bin_folder'])
+        self.env_info.PATH.append(binpath)
 
     @property
     def _data(self):
