@@ -1,0 +1,4 @@
+sources:
+  "1.16.0":
+    - url: "http://download.qt.io/official_releases/qbs/1.16.0/qbs-src-1.16.0.tar.gz"
+      sha256: a77be21ec08904b86afdbe798dd3597d070ee8f9ca9cc9ed3f21b87d6fa12b25

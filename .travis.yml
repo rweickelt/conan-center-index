@@ -1,0 +1,67 @@
+language: cpp
+
+git:
+  submodules: false
+
+cache:
+  directories:
+  - ~/.conan/data
+
+env:
+  global:
+    - QT_CONAN_REF="qt/5.15.0@conan/stable"
+    - QT_CONAN_COMMON_OPTIONS="--build=missing -tf None -o qt:widgets=False -o qt:GUI=False -o qt:qtscript=True -o qt:shared=False"
+
+jobs:
+  include:
+    - stage: Build
+      dist: bionic
+      env:
+        - QT_CONAN_OPTIONS=""
+      addons:
+        apt:
+          - python3-pip
+      before_install:
+        - pip3 install --user --upgrade pip setuptools
+        - pip3 install --user conan conan_package_tools
+        # - conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+        # - conan config set hooks.conan-center
+      script:
+        - conan export recipes/qt/all/ ${QT_CONAN_REF}
+        - conan create recipes/qt/all/ ${QT_CONAN_REF} ${QT_CONAN_COMMON_OPTIONS} ${QT_CONAN_OPTIONS}
+      before_cache:
+        - conan remove "*" -s -b -f
+
+
+    - stage: Build
+      os: osx
+      osx_image: xcode11.6
+      env:
+        - QT_CONAN_OPTIONS="-s compiler=apple-clang -s compiler.libcxx=libc++ -s compiler.version=11.0 --build=missing"
+      before_install:
+        - sudo pip3 install conan conan_package_tools
+        # - conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+        # - conan config set hooks.conan-center
+      script:
+        - conan export recipes/qt/all/ ${QT_CONAN_REF}
+        - conan create recipes/qt/all/ ${QT_CONAN_REF} ${QT_CONAN_COMMON_OPTIONS} ${QT_CONAN_OPTIONS} -o "qt:config=QMAKE_CXXFLAGS+=-Wno-deprecated-declarations QMAKE_CXXFLAGS+=-Wno-tautological-constant-out-of-range-compare"
+      before_cache:
+        - conan remove "*" -s -b -f
+
+    - stage: Build
+      os: windows
+      language: shell
+      env:
+        - PATH="/c/Python38:/c/Python39:/c/Python38/Scripts:/c/Python39/Scripts:${PATH}"
+        - QT_CONAN_OPTIONS="-s compiler="Visual Studio" -s compiler.version=16"
+      before_install:
+        - choco install python
+        - choco install -y visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+        - pip3 install conan conan_package_tools
+        # - conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+        # - conan config set hooks.conan-center
+      script:
+        - conan export recipes/qt/all/ ${QT_CONAN_REF}
+        - conan create recipes/qt/all/ ${QT_CONAN_REF} ${QT_CONAN_COMMON_OPTIONS} ${QT_CONAN_OPTIONS}
+      before_cache:
+        - conan remove "*" -s -b -f
