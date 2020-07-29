@@ -17,7 +17,7 @@ jobs:
     - stage: Build
       dist: bionic
       env:
-        - QT_CONAN_OPTIONS=""
+        - QT_CONAN_OPTIONS="-o qt:config=-ltcg"
       addons:
         apt:
           - python3-pip
@@ -44,7 +44,7 @@ jobs:
         # - conan config set hooks.conan-center
       script:
         - conan export recipes/qt/all/ ${QT_CONAN_REF}
-        - conan create recipes/qt/all/ ${QT_CONAN_REF} ${QT_CONAN_COMMON_OPTIONS} ${QT_CONAN_OPTIONS} -o "qt:config=QMAKE_CXXFLAGS+=-Wno-deprecated-declarations QMAKE_CXXFLAGS+=-Wno-tautological-constant-out-of-range-compare"
+        - conan create recipes/qt/all/ ${QT_CONAN_REF} ${QT_CONAN_COMMON_OPTIONS} ${QT_CONAN_OPTIONS} -o "qt:config=-ltcg QMAKE_CXXFLAGS+=-Wno-deprecated-declarations QMAKE_CXXFLAGS+=-Wno-tautological-constant-out-of-range-compare"
       before_cache:
         - conan remove "*" -s -b -f
 
@@ -53,7 +53,7 @@ jobs:
       language: shell
       env:
         - PATH="/c/Python38:/c/Python39:/c/Python38/Scripts:/c/Python39/Scripts:${PATH}"
-        - QT_CONAN_OPTIONS="-s compiler="Visual Studio" -s compiler.version=16"
+        - QT_CONAN_OPTIONS="-s compiler="Visual Studio" -s compiler.version=16 -o qt:config=-ltcg"
       before_install:
         - choco install python
         - choco install -y visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
