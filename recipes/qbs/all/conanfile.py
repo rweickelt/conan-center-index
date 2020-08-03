@@ -9,10 +9,14 @@ class QbsConan(ConanFile):
     url = "https://github.com/conan-io/conan-center-index"
     homepage = "http://qbs.io"
     license = "LGPL-2.1-only", "LGPL-3.0-only", "Nokia-Qt-exception-1.1"
-    settings = "arch", "os"
+    settings = "arch", "build_type", "compiler", "os"
     no_copy_source=True
 
     build_requires = "qt/5.15.0@conan/stable"
+
+    def build_requirements(self):
+        if tools.os_info.is_windows and self.settings.compiler == "Visual Studio":
+            self.build_requires("jom/1.1.3")
 
     def configure(self):
         if self.settings.os not in ["Windows", "Linux", "Macos"]:
@@ -20,15 +24,36 @@ class QbsConan(ConanFile):
         if self.settings.arch not in ["x86_64"]:
             raise ConanInvalidConfiguration("The arch ({}) is not supported by {}.".format(self.settings.arch, self.name))
 
+        self.options["qt"].shared = False
+        self.options["qt"].widgets=False
+        self.options["qt"].GUI=False
+        self.options["qt"].qtscript=True
+        for dep, options in self._data["options"].items():
+            for key, value in options.items():
+                setattr(self.options[dep], key, value)
+
     def source(self):
-        tools.get(**self._data['sources'])
+        tools.get(**self.conan_data['sources'][self.version][0])
 
     def build(self):
-        self.run("qmake")
-        self.run("make -j4")
+        qmake = os.path.join(self.deps_cpp_info["qt"].bin_paths[0], "qmake")
+        source_dirpath = os.path.join(self.source_folder, "qbs-src-%s" % self.version)
+        project_filepath = os.path.join(source_dirpath, "qbs.pro")
+        args = [
+            "-r", project_filepath,
+            "QT-=gui",
+            "CONFIG+=release",
+            "CONFIG-=debug",
+            "CONFIG-=debug_and_release"
+        ]
+        ncores = tools.cpu_count()
+
+        with tools.vcvars(self.settings) if self.settings.compiler == "Visual Studio" else tools.no_op():
+            self.run("%s %s" % (qmake, " ".join(args)), run_environment=True)
+            self.run("%s -j%s" % (self._data["build_tool"], ncores), run_environment=True)
 
     def package(self):
-        for p in self._data['package']:
+         for p in self._data["package"]:
             self.copy(**p, symlinks=True)
 
     def package_info(self):
@@ -39,62 +64,52 @@ class QbsConan(ConanFile):
     def _data(self):
         data = {
             'Linux': {
-                'sources': self.conan_data['sources'][self.version][0],
-                'installer': self.conan_data['sources'][self.version][1],
+                "build_tool": "make",
+                'options': {
+                    'qt': {
+                        'with_pq': False,
+                        'config': "QMAKE_CXX_FLAGS+=-ffunction-sections QMAKE_CXX_FLAGS+=-fdata-sections"
+                    }
+                },
                 'package': [
-                    {'dst': 'bin', 'pattern': 'bin/qbs*'},
-                    {'dst': 'bin', 'pattern': 'bin/qt.conf'},
-                    {'dst': 'bin', 'pattern': 'lib/qtcreator/libqbs*'},
-                    {'dst': 'bin', 'pattern': 'lib/qtcreator/plugins/qbs/*'},
-                    {'dst': 'bin', 'pattern': 'lib/Qt/lib/libic*'},
-                    {'dst': 'bin', 'pattern': 'lib/Qt/lib/libQt5Core*'},
-                    {'dst': 'bin', 'pattern': 'lib/Qt/lib/libQt5Gui*'},
-                    {'dst': 'bin', 'pattern': 'lib/Qt/lib/libQt5Network*'},
-                    {'dst': 'bin', 'pattern': 'lib/Qt/lib/libQt5Script*'},
-                    {'dst': 'bin', 'pattern': 'lib/Qt/lib/libQt5Xml*'},
-                    {'dst': 'bin', 'pattern': 'libexec/qtcreator/qbs*'},
-                    {'dst': 'bin', 'pattern': 'share/qtcreator/qbs/*'},
+                    {'dst': '', 'pattern': 'bin/*'},
+                    {'dst': '', 'pattern': 'lib/*'},
+                    {'dst': '', 'pattern': 'libexec/*'},
+                    {'dst': '', 'pattern': 'share/*'},
                     {'src': 'qbs-src-%s' % self.version, 'dst': 'licenses', 'pattern': 'LICENSE*'},
                     {'src': 'qbs-src-%s' % self.version, 'dst': 'licenses', 'pattern': 'LGPL*'}
                 ],
-                'bin_folder': 'bin/bin'
+                'bin_folder': 'usr/local/bin'
             },
             'Macos': {
-                'sources': self.conan_data['sources'][self.version][0],
-                'installer': self.conan_data['sources'][self.version][2],
+                "build_tool": "make",
+                'options': {
+                    'qt': {
+                        'config': "QMAKE_CXXFLAGS+=-Wno-deprecated-declarations QMAKE_CXXFLAGS+=-Wno-tautological-constant-out-of-range-compare"
+                    }
+                },
                 'package': [
-                    { 'src': 'Qt Creator.app/Contents', 'dst': 'bin', 'pattern': 'MacOS/qbs*'},
-                    { 'src': 'Qt Creator.app/Contents', 'dst': 'bin', 'pattern': 'Frameworks/libqbs*'},
-                    { 'src': 'Qt Creator.app/Contents', 'dst': 'bin', 'pattern': 'Frameworks/QtCore*'},
-                    { 'src': 'Qt Creator.app/Contents', 'dst': 'bin', 'pattern': 'Frameworks/QtGui*'},
-                    { 'src': 'Qt Creator.app/Contents', 'dst': 'bin', 'pattern': 'Frameworks/QtNetwork*'},
-                    { 'src': 'Qt Creator.app/Contents', 'dst': 'bin', 'pattern': 'Frameworks/QtScript*'},
-                    { 'src': 'Qt Creator.app/Contents', 'dst': 'bin', 'pattern': 'Frameworks/QtXml*'},
-                    { 'src': 'Qt Creator.app/Contents', 'dst': 'bin', 'pattern': 'PlugIns/qbs/*'},
-                    { 'src': 'Qt Creator.app/Contents', 'dst': 'bin', 'pattern': 'Resources/qbs/*'},
-                    { 'src': 'Qt Creator.app/Contents', 'dst': 'bin', 'pattern': 'Resources/libexec/qbs*'},
-                    { 'src': 'qbs-src-%s' % self.version, 'pattern': 'LICENSE*', 'dst': 'licenses'},
-                    { 'src': 'qbs-src-%s' % self.version, 'pattern': 'LGPL*', 'dst': 'licenses'}
+                    {'dst': '', 'pattern': 'bin/*'},
+                    {'dst': '', 'pattern': 'lib/*'},
+                    {'dst': '', 'pattern': 'libexec/*'},
+                    {'dst': '', 'pattern': 'share/*'},
+                    {'src': 'qbs-src-%s' % self.version, 'dst': 'licenses', 'pattern': 'LICENSE*'},
+                    {'src': 'qbs-src-%s' % self.version, 'dst': 'licenses', 'pattern': 'LGPL*'}
                 ],
-                'bin_folder': 'bin/MacOS'
+                'bin_folder': 'bin'
             },
             'Windows': {
-                'sources': self.conan_data['sources'][self.version][0],
-                'installer': self.conan_data['sources'][self.version][3],
+                "build_tool": "jom" if self.settings.compiler == "Visual Studio" else "mingw32-make",
+                'options': {},
                 'package': [
-                    { 'dst': 'bin', 'pattern': 'bin/qbs*'},
-                    { 'dst': 'bin', 'pattern': 'bin/Qt5Core*'},
-                    { 'dst': 'bin', 'pattern': 'bin/Qt5Gui*'},
-                    { 'dst': 'bin', 'pattern': 'bin/Qt5Network*'},
-                    { 'dst': 'bin', 'pattern': 'bin/Qt5Script*'},
-                    { 'dst': 'bin', 'pattern': 'bin/Qt5Xml*'},
-                    { 'dst': 'bin', 'pattern': 'bin/dw*'},
-                    { 'dst': 'bin', 'pattern': 'lib/qtcreator/plugins/qbs*'},
-                    { 'dst': 'bin', 'pattern': 'share/qtcreator/qbs*'},
-                    { 'src': 'qbs-src-%s' % self.version, 'pattern': 'LICENSE*', 'dst': 'licenses'},
-                    { 'src': 'qbs-src-%s' % self.version, 'pattern': 'LGPL*', 'dst': 'licenses'}
+                    {'dst': '', 'pattern': 'bin/*'},
+                    {'dst': '', 'pattern': 'lib/*'},
+                    {'dst': '', 'pattern': 'libexec/*'},
+                    {'dst': '', 'pattern': 'share/*'},
+                    {'src': 'qbs-src-%s' % self.version, 'dst': 'licenses', 'pattern': 'LICENSE*'},
+                    {'src': 'qbs-src-%s' % self.version, 'dst': 'licenses', 'pattern': 'LGPL*'}
                 ],
-                'bin_folder': 'bin/bin'
+                'bin_folder': 'bin'
             }
         }
         return data[str(self.settings.os)]
