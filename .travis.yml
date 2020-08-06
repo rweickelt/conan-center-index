@@ -1,0 +1,96 @@
+language: cpp
+
+git:
+  submodules: false
+
+cache:
+  directories:
+  - ~/.conan/data
+
+jobs:
+  include:
+    - stage: Build
+      dist: bionic
+      addons:
+        apt:
+          - python3-pip
+          #          - libgl1-mesa-dev
+          #          - libfontconfig1-dev
+          #          - libfreetype6-dev
+          #          - libx11-dev
+          #          - libxext-dev
+          #          - libxfixes-dev
+          #          - libxi-dev
+          #          - libxrender-dev
+          #          - libxcb1-dev
+          #          - libx11-xcb-dev
+          #          - libxcb-glx0-dev
+          #          - libxkbcommon-x11-dev
+          #          - libxcb-keysyms1-dev
+          #          - libxcb-image0-dev
+          #          - libxcb-shm0-dev
+          #          - libxcb-icccm4-dev
+          #          - libxcb-sync0-dev
+          #          - libxcb-xfixes0-dev
+          #          - libxcb-shape0-dev
+          #          - libxcb-randr0-dev
+          #          - libxcb-render-util0-dev
+          - xorg-dev
+          - libxcb-xinerama0-dev
+      env:
+        - CONAN_ENV_COMPILER=gcc
+        - CONAN_ENV_COMPILER_VERSION=7
+        - CONAN_ENV_COMPILER_LIBCXX=libstdc++
+      before_install:
+        - pip3 install --user --upgrade pip setuptools
+        - pip3 install --user conan==1.27.1 conan_package_tools
+        - sudo apt-get build-dep qt5-default
+        # - conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+        # - conan config set hooks.conan-center
+      script:
+        - travis_wait 45 conan create recipes/qt/all/ qt/5.15.0@conan/stable -o qt:shared=False -o qt:qtscript=True
+      after_failure:
+        - cat log.txt
+      before_cache:
+        - conan remove "*" -s -b -f
+
+
+    - stage: Build
+      os: osx
+      osx_image: xcode11.6
+      env:
+        - CONAN_ENV_COMPILER=apple-clang
+        - CONAN_ENV_COMPILER_VERSION=11.0
+        - CONAN_ENV_COMPILER_LIBCXX=libc++
+      before_install:
+        - sudo pip3 install conan==1.27.1 conan_package_tools
+        # - conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+        # - conan config set hooks.conan-center
+      script:
+        - travis_wait 45 conan create recipes/qt/all/ qt/5.15.0@conan/stable -o qt:shared=False -o qt:qtscript=True
+      after_failure:
+        - cat log.txt
+      before_cache:
+        - conan remove "*" -s -b -f
+
+    - stage: Build
+      os: windows
+      language: shell
+      env:
+        - PATH="/c/Python38:/c/Python39:/c/Python38/Scripts:/c/Python39/Scripts:${PATH}"
+        - CONAN_ENV_COMPILER="Visual Studio"
+        - CONAN_ENV_COMPILER_VERSION=16
+      before_install:
+        - choco install python
+        - choco install -y visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+        - pip3 install conan==1.27.1 conan_package_tools
+        # - conan config install https://github.com/conan-io/hooks.git -sf hooks -tf hooks
+        # - conan config set hooks.conan-center
+      script:
+        - travis_wait 45 conan create recipes/qt/all/ qt/5.15.0@conan/stable -o qt:shared=False -o qt:qtscript=True
+      before_cache:
+        - conan remove "*" -s -b -f
+      cache:
+        directories:
+        - ~/.conan/data
+        - C:/.conan
